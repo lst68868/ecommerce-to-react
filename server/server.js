@@ -52,21 +52,31 @@ process.on('SIGINT', () => {
 
 // Endpoint to seed the database with products from the given API
 app.get('/seed', async (req, res) => {
- try {
-   const response = await axios.get('https://fakestoreapi.com/products');
-   const products = response.data;
+  try {
+      const response = await axios.get('https://fakestoreapi.com/products');
+      const products = response.data;
 
-   // Deleting all products before seeding
-   await Product.deleteMany({});
-   // Creating products
-   await Product.create(products);
+      // Deleting all products before seeding
+      await Product.deleteMany({});
+      // Creating products
+      await Product.create(products);
 
-   res.json({ message: 'Database seeded successfully' });
- } catch (error) {
-   console.error(error);
-   res.status(500).json({ error: 'Internal Server Error' });
- }
+      // Deleting all cart items before seeding
+      await Cart.deleteMany({});
+      // Creating a sample cart item with the first product and quantity 1
+      // Make sure there is at least one product
+      if (products.length > 0) {
+          const sampleCartItem = { product: products[0].id, quantity: 1 };
+          await Cart.create(sampleCartItem);
+      }
+
+      res.json({ message: 'Database seeded successfully' });
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
+
 
 // Endpoint to fetch all products
 app.get('/products', async (req, res) => {
@@ -130,15 +140,26 @@ app.post('/cart', async (req, res) => {
 
 // Endpoint to fetch all cart items
 app.get('/cart', async (req, res) => {
- try {
-   // Populating product field to include all product information
-   const cartItems = await Cart.find({}).populate('product');
-   res.json(cartItems);
- } catch (error) {
-   console.error(error);
-   res.status(500).json({ error: 'Internal Server Error' });
- }
+  try {
+      // Populating product field to include all product information
+      const cartItems = await Cart.find({}).populate('product');
+      
+      // Check for undefined or null cartItems
+      if (!cartItems) {
+          console.error('Cart items not found');
+          return res.status(404).json({ error: 'Cart items not found' });
+      }
+
+      // Log the cart items for debugging
+      console.log('Cart items:', cartItems);
+      
+      res.json(cartItems);
+  } catch (error) {
+      console.error('Error retrieving cart items:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
+
 
 // Delete a specific item from the cart by ID
 app.delete('/cart/:id', async (req, res) => {
