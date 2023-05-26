@@ -1,119 +1,45 @@
-// Fetch products from the server
-function fetchProducts() {
-  axios
-    .get('/products')
-    .then((response) => response.data)
-    .then((products) => {
-      displayProducts(products);
-    })
-    .catch((error) => console.error(error));
+document.getElementById('loadProducts').addEventListener('click', loadProducts);
+document.getElementById('clearProducts').addEventListener('click', clearProducts);
+document.getElementById('loadCart').addEventListener('click', loadCart);
+
+async function loadProducts() {
+    try {
+        const response = await fetch('http://localhost:3002/products');
+        const products = await response.json();
+
+        const productsDiv = document.getElementById('products');
+        productsDiv.innerHTML = '';
+
+        for (let product of products) {
+            const productDiv = document.createElement('div');
+            productDiv.className = 'product';
+            productDiv.textContent = `${product.title} - $${product.price}`;
+            productsDiv.appendChild(productDiv);
+        }
+    } catch (err) {
+        console.error('Failed to load products:', err);
+    }
 }
 
-// Display products on the page
-function displayProducts(products) {
-  const productsContainer = document.querySelector('.products-container');
-  productsContainer.innerHTML = '';
-
-  products.forEach((product) => {
-    const card = document.createElement('div');
-    card.classList.add('product-card');
-
-    const image = document.createElement('img');
-    image.src = product.image;
-    card.appendChild(image);
-
-    const name = document.createElement('h3');
-    name.textContent = product.title;
-    card.appendChild(name);
-
-    const price = document.createElement('p');
-    price.textContent = `Price: $${product.price}`;
-    card.appendChild(price);
-
-    const addToCartButton = document.createElement('button');
-    addToCartButton.textContent = 'Add to Cart';
-    addToCartButton.addEventListener('click', () => {
-      const quantity = prompt("Enter quantity:");
-      if(quantity)
-        addToCart(product.id, quantity);
-    });
-    card.appendChild(addToCartButton);
-
-    productsContainer.appendChild(card);
-  });
+function clearProducts() {
+    document.getElementById('products').innerHTML = '';
 }
 
-// Add a product to the cart
-function addToCart(productId, quantity) {
-  const item = { productId, quantity };
+async function loadCart() {
+    try {
+        const response = await fetch('http://localhost:3002/cart');
+        const cartItems = await response.json();
 
-  axios
-    .post('/cart', item)
-    .then((response) => response.data)
-    .then((cartItem) => {
-      alert('Product added to cart');
-      console.log(cartItem);
-    })
-    .catch((error) => console.error(error));
+        const cartDiv = document.getElementById('cart');
+        cartDiv.innerHTML = '';
+
+        for (let item of cartItems) {
+            const cartItemDiv = document.createElement('div');
+            cartItemDiv.className = 'cart-item';
+            cartItemDiv.textContent = `Product ID: ${item.product.id}, Quantity: ${item.quantity}`;
+            cartDiv.appendChild(cartItemDiv);
+        }
+    } catch (err) {
+        console.error('Failed to load cart:', err);
+    }
 }
-
-// Fetch the cart items from the server
-function fetchCartItems() {
-  axios
-    .get('/cart')
-    .then((response) => response.data)
-    .then((cartItems) => {
-      displayCartItems(cartItems);
-    })
-    .catch((error) => console.error(error));
-}
-
-// Display cart items on the page
-function displayCartItems(cartItems) {
-  const cartItemsContainer = document.getElementById('cart-items');
-  cartItemsContainer.innerHTML = '';
-
-  cartItems.forEach((cartItem) => {
-    const item = document.createElement('div');
-    item.classList.add('cart-item');
-
-    const name = document.createElement('span');
-    name.textContent = cartItem.product.title;
-    item.appendChild(name);
-
-    const quantity = document.createElement('span');
-    quantity.textContent = `Quantity: ${cartItem.quantity}`;
-    item.appendChild(quantity);
-
-    const removeButton = document.createElement('button');
-    removeButton.textContent = 'Remove';
-    removeButton.addEventListener('click', () => removeFromCart(cartItem.id));
-    item.appendChild(removeButton);
-
-    cartItemsContainer.appendChild(item);
-  });
-}
-
-// Remove a cart item
-function removeFromCart(itemId) {
-  axios
-    .delete(`/cart/${itemId}`)
-    .then((response) => response.data)
-    .then((deletedItem) => {
-      alert('Product removed from cart');
-      console.log(deletedItem);
-    })
-    .catch((error) => console.error(error));
-}
-
-// Checkout
-function checkout() {
-  // Implement the checkout functionality as needed
-  alert('Checkout');
-}
-
-// Fetch products and cart items on page load
-window.addEventListener('DOMContentLoaded', () => {
-  fetchProducts();
-  fetchCartItems();
-});

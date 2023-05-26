@@ -1,20 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>E-commerce Store</title>
-  <link rel="stylesheet" href="/style.css">
-  <script src="/main.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product and Cart Viewer</title>
+    <style>
+        #products, #cart {
+            margin-top: 20px;
+        }
+
+        .product, .cart-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #333;
+        }
+    </style>
 </head>
 <body>
-  <h1>E-commerce Store</h1>
+    <button id="loadProducts">Load Products</button>
+    <button id="clearProducts">Clear Products</button>
+    <div id="products"></div>
 
-  <div class="products-container"></div>
+    <button id="loadCart">Load Cart</button>
+    <div id="cart"></div>
 
-  <div id="cart-items"></div>
-
-  <button onclick="checkout()">Checkout</button>
-
+    <script src="main.js"></script>
 </body>
 </html>
