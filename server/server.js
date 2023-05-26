@@ -5,8 +5,8 @@ import axios from 'axios';
 import dotenv from "dotenv";
 import { fileURLToPath } from 'url';
 import path from 'path';
-import Product from '/Users/leotulchin/Desktop/Coding_Projects/practice_projects/ecommerce-to-react/models/Product.js';
-import Cart from '/Users/leotulchin/Desktop/Coding_Projects/practice_projects/ecommerce-to-react/models/Cart.js';
+import Product from '../models/Product.js';
+import Cart from '../models/Cart.js';
 
 const app = express();
 dotenv.config();
