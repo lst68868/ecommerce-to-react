@@ -2,7 +2,15 @@
 document.getElementById('loadProducts').addEventListener('click', loadProducts);
 document.getElementById('clearProducts').addEventListener('click', clearProducts);
 document.getElementById('loadCart').addEventListener('click', loadCart);
-document.getElementById('addToCartForm').addEventListener('submit', addToCart);
+document.getElementById('addToCartForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // prevent the form from submitting normally
+
+    // get values from the form inputs
+    const productId = document.getElementById('productId').value;
+    const quantity = document.getElementById('quantity').value;
+
+    addToCart(productId, quantity);
+});
 
 // Function to load products from server
 async function loadProducts() {
@@ -24,7 +32,7 @@ async function loadProducts() {
             // Create and add a button to add the product to the cart
             const addButton = document.createElement('button');
             addButton.textContent = 'Add to cart';
-            addButton.addEventListener('click', () => addToCart(product.id, 1));  // Here, we assume a quantity of 1. Adjust as necessary.
+            addButton.addEventListener('click', () => addToCart(product._id, 1));  // Here, we assume a quantity of 1. Adjust as necessary.
 
             productDiv.appendChild(addButton);
             productsDiv.appendChild(productDiv);
@@ -34,7 +42,6 @@ async function loadProducts() {
         console.error('Failed to load products:', err);
     }
 }
-
 
 // Function to clear products from the page
 function clearProducts() {
@@ -71,7 +78,6 @@ async function loadCart() {
         console.error('Failed to load cart:', err);
     }
 }
-
 
 // Function to add a product to the cart
 async function addToCart(productId, quantity) {

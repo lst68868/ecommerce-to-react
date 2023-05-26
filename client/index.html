@@ -1,50 +1,28 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product and Cart Viewer</title>
-    <!-- Adding styling to product and cart divs -->
-    <style>
-        #products, #cart {
-            margin-top: 20px;
-        }
-
-        .product, .cart-item {
-            margin-bottom: 10px;
-            padding: 10px;
-            border: 1px solid #333;
-        }
-    </style>
+    <title>E-commerce Site</title>
 </head>
 <body>
-    <!-- Button to load products -->
     <button id="loadProducts">Load Products</button>
-    <!-- Button to clear the display of products -->
     <button id="clearProducts">Clear Products</button>
-    <!-- Products display section -->
     <div id="products"></div>
 
-    <!-- Other HTML here -->
-
-<!-- Form for users to add to cart -->
-<h2>Add Product to Cart</h2>
-<form id="addToCartForm">
-    <label for="productId">Product ID:</label><br>
-    <input type="text" id="productId" name="productId"><br>
-    <label for="quantity">Quantity:</label><br>
-    <input type="number" id="quantity" name="quantity"><br>
-    <input type="submit" value="Add to Cart">
-</form>
-
-<!-- Other HTML here -->
-
-
-    <!-- Commented out cart load button and cart display section -->
+    <h2>Your Cart</h2>
     <button id="loadCart">Load Cart</button>
     <div id="cart"></div>
 
-    <!-- Link to main JavaScript -->
+    <h2>Add to Cart</h2>
+    <form id="addToCartForm">
+        <label for="productId">Product ID:</label>
+        <input type="text" id="productId" name="productId" required>
+
+        <label for="quantity">Quantity:</label>
+        <input type="number" id="quantity" name="quantity" min="1" required>
+
+        <input type="submit" value="Add to Cart">
+    </form>
+
     <script src="main.js"></script>
 </body>
 </html>
