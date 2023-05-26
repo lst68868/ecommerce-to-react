@@ -4,7 +4,7 @@ document.getElementById('loadCart').addEventListener('click', loadCart);
 
 async function loadProducts() {
     try {
-        const response = await fetch('http://localhost:3002/products');
+        const response = await fetch('https://ecommerce-to-react.herokuapp.com/products');
         const products = await response.json();
 
         const productsDiv = document.getElementById('products');
@@ -27,7 +27,7 @@ function clearProducts() {
 
 async function loadCart() {
     try {
-        const response = await fetch('http://localhost:3002/cart');
+        const response = await fetch('https://ecommerce-to-react.herokuapp.com/cart');
         const cartItems = await response.json();
 
         const cartDiv = document.getElementById('cart');
