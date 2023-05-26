@@ -2,6 +2,7 @@
 document.getElementById('loadProducts').addEventListener('click', loadProducts);
 document.getElementById('clearProducts').addEventListener('click', clearProducts);
 document.getElementById('loadCart').addEventListener('click', loadCart);
+document.getElementById('addToCartForm').addEventListener('submit', addToCart);
 
 // Function to load products from server
 async function loadProducts() {
@@ -47,11 +48,42 @@ async function loadCart() {
         for (let item of cartItems) {
             const itemDiv = document.createElement('div');
             itemDiv.className = 'cart-item';
-            itemDiv.textContent = `${item.title} - $${item.price} x ${item.quantity}`;
+            itemDiv.textContent = `${item.product.title} - $${item.product.price} x ${item.quantity} - Item ID: ${item.id}`;
             cartDiv.appendChild(itemDiv);
         }
     } catch (err) {
         // Log error if fetch fails
         console.error('Failed to load cart:', err);
+    }
+}
+
+async function addToCart(event) {
+    event.preventDefault();
+
+    // Get user inputs
+    const productId = document.getElementById('productId').value;
+    const quantity = document.getElementById('quantity').value;
+
+    // Post to /cart endpoint
+    try {
+        const response = await fetch('https://ecommerce-to-react.herokuapp.com/cart', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                productId: productId,
+                quantity: quantity
+            })
+        });
+        const result = await response.json();
+
+        // Log result
+        console.log(result);
+
+        // Reload cart
+        loadCart();
+    } catch (err) {
+        console.error('Failed to add to cart:', err);
     }
 }
