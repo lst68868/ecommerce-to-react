@@ -20,6 +20,13 @@ async function loadProducts() {
             const productDiv = document.createElement('div');
             productDiv.className = 'product';
             productDiv.textContent = `${product.title} - $${product.price}`;
+
+            // Create and add a button to add the product to the cart
+            const addButton = document.createElement('button');
+            addButton.textContent = 'Add to cart';
+            addButton.addEventListener('click', () => addToCart(product.id, 1));  // Here, we assume a quantity of 1. Adjust as necessary.
+
+            productDiv.appendChild(addButton);
             productsDiv.appendChild(productDiv);
         }
     } catch (err) {
@@ -27,6 +34,7 @@ async function loadProducts() {
         console.error('Failed to load products:', err);
     }
 }
+
 
 // Function to clear products from the page
 function clearProducts() {
@@ -44,12 +52,19 @@ async function loadCart() {
         const cartDiv = document.getElementById('cart');
         cartDiv.innerHTML = '';
 
-        // Add each cart item to the page
-        for (let item of cartItems) {
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'cart-item';
-            itemDiv.textContent = `${item.product.title} - $${item.product.price} x ${item.quantity} - Item ID: ${item.id}`;
-            cartDiv.appendChild(itemDiv);
+        // Check if the cart is empty
+        if (cartItems.length === 0) {
+            const emptyCartDiv = document.createElement('div');
+            emptyCartDiv.textContent = "Your cart is empty";
+            cartDiv.appendChild(emptyCartDiv);
+        } else {
+            // Add each cart item to the page
+            for (let item of cartItems) {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'cart-item';
+                itemDiv.textContent = `${item.product.title} - $${item.product.price} x ${item.quantity}`;
+                cartDiv.appendChild(itemDiv);
+            }
         }
     } catch (err) {
         // Log error if fetch fails
@@ -57,33 +72,23 @@ async function loadCart() {
     }
 }
 
-async function addToCart(event) {
-    event.preventDefault();
 
-    // Get user inputs
-    const productId = document.getElementById('productId').value;
-    const quantity = document.getElementById('quantity').value;
-
-    // Post to /cart endpoint
+// Function to add a product to the cart
+async function addToCart(productId, quantity) {
     try {
         const response = await fetch('https://ecommerce-to-react.herokuapp.com/cart', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                productId: productId,
-                quantity: quantity
-            })
+            body: JSON.stringify({ productId, quantity })
         });
-        const result = await response.json();
-
-        // Log result
-        console.log(result);
-
-        // Reload cart
+        const addedCartItem = await response.json();
+        console.log(addedCartItem);
+        // Reload the cart to reflect the new item
         loadCart();
     } catch (err) {
+        // Log error if fetch fails
         console.error('Failed to add to cart:', err);
     }
 }
