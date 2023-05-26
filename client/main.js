@@ -25,21 +25,21 @@ function clearProducts() {
     document.getElementById('products').innerHTML = '';
 }
 
-// async function loadCart() {
-//     try {
-//         const response = await fetch('https://ecommerce-to-react.herokuapp.com/cart');
-//         const cartItems = await response.json();
+async function loadCart() {
+    try {
+        const response = await fetch('https://ecommerce-to-react.herokuapp.com/cart');
+        const cartItems = await response.json();
 
-//         const cartDiv = document.getElementById('cart');
-//         cartDiv.innerHTML = '';
+        const cartDiv = document.getElementById('cart');
+        cartDiv.innerHTML = '';
 
-//         for (let item of cartItems) {
-//             const cartItemDiv = document.createElement('div');
-//             cartItemDiv.className = 'cart-item';
-//             cartItemDiv.textContent = `Product ID: ${item.product.id}, Quantity: ${item.quantity}`;
-//             cartDiv.appendChild(cartItemDiv);
-//         }
-//     } catch (err) {
-//         console.error('Failed to load cart:', err);
-//     }
-// }
+        for (let item of cartItems) {
+            const cartItemDiv = document.createElement('div');
+            cartItemDiv.className = 'cart-item';
+            cartItemDiv.textContent = `Product ID: ${item.product.id}, Quantity: ${item.quantity}`;
+            cartDiv.appendChild(cartItemDiv);
+        }
+    } catch (err) {
+        console.error('Failed to load cart:', err);
+    }
+}
