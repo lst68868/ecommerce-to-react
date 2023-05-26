@@ -140,6 +140,75 @@ app.get('/cart', async (req, res) => {
  }
 });
 
+// Delete a specific item from the cart by ID
+app.delete('/cart/:id', async (req, res) => {
+ const cartItemId = req.params.id;
+
+ try {
+   const cartItem = await Cart.findById(cartItemId);
+   if (!cartItem) {
+     return res.status(404).json({ error: 'Cart item not found' });
+   }
+
+   await Cart.findByIdAndDelete(cartItemId);
+   res.json({ message: 'Cart item removed successfully' });
+ } catch (error) {
+   console.error(error);
+   res.status(500).json({ error: 'Internal Server Error' });
+ }
+});
+
+// Delete a specific item from the cart by ID
+app.delete('/cart/:id', async (req, res) => {
+ const cartItemId = req.params.id;
+
+ try {
+   const cartItem = await Cart.findOne({ id: cartItemId });
+   if (!cartItem) {
+     return res.status(404).json({ error: 'Cart item not found' });
+   }
+
+   await Cart.deleteOne({ id: cartItemId });
+   res.json({ message: 'Cart item removed successfully' });
+ } catch (error) {
+   console.error(error);
+   res.status(500).json({ error: 'Internal Server Error' });
+ }
+});
+
+// Clear the entire cart
+app.delete('/cart', async (req, res) => {
+ try {
+   await Cart.deleteMany({});
+   res.json({ message: 'Cart cleared successfully' });
+ } catch (error) {
+   console.error(error);
+   res.status(500).json({ error: 'Internal Server Error' });
+ }
+});
+
+// Update the quantity of a specific cart item
+app.put('/cart/:id', async (req, res) => {
+ const cartItemId = req.params.id;
+ const { quantity } = req.body;
+
+ try {
+   const cartItem = await Cart.findOne({ id: cartItemId });
+   if (!cartItem) {
+     return res.status(404).json({ error: 'Cart item not found' });
+   }
+
+   cartItem.quantity = quantity;
+   await cartItem.save();
+   
+   res.json(cartItem);
+ } catch (error) {
+   console.error(error);
+   res.status(500).json({ error: 'Internal Server Error' });
+ }
+});
+
+
 // Starting the server
 app.listen(PORT, () => {
  console.log(`Server is running on port ${PORT}`);

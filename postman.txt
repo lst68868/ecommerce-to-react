@@ -1,0 +1,35 @@
+
+Here's how you can test each route using Postman:
+
+GET /products: To fetch all products, select GET as the HTTP method, input https://ecommerce-to-react.herokuapp.com/products in the address bar and hit Send.
+
+GET /products/:id: To fetch a specific product, select GET as the HTTP method, input https://ecommerce-to-react.herokuapp.com/products/{productId} in the address bar (replace {productId} with an actual product ID), and hit Send.
+
+GET /products/category/:category: To fetch products by category, select GET as the HTTP method, input https://ecommerce-to-react.herokuapp.com/products/category/{category} in the address bar (replace {category} with an actual category), and hit Send.
+
+POST /cart: To add a product to the cart, select POST as the HTTP method, input https://ecommerce-to-react.herokuapp.com/cart in the address bar, then go to the Body tab, select raw, choose JSON from the dropdown, and input the following JSON:
+
+{
+  "productId": "{productId}",
+  "quantity": {quantity}
+}
+
+Replace {productId} with an actual product ID and {quantity} with the number of products to add, then hit Send.
+
+GET /cart: To fetch all cart items, select GET as the HTTP method, input https://ecommerce-to-react.herokuapp.com/cart in the address bar and hit Send.
+
+DELETE /cart/:id: To delete a specific item from the cart, select DELETE as the HTTP method, input https://ecommerce-to-react.herokuapp.com/cart/{cartItemId} in the address bar (replace {cartItemId} with an actual cart item ID), and hit Send.
+
+DELETE /cart: To clear the cart, select DELETE as the HTTP method, input https://ecommerce-to-react.herokuapp.com/cart in the address bar and hit Send.
+
+PUT /cart/:id: To update the quantity of a specific cart item, select PUT as the HTTP method, input https://ecommerce-to-react.herokuapp.com/cart/{cartItemId} in the address bar (replace {cartItemId} with an actual cart item ID), then go to the Body tab, select raw, choose JSON from the dropdown, and input the following JSON:
+
+{
+  "quantity": {quantity}
+}
+
+Replace {quantity} with the new quantity, then hit Send.
+
+GET /seed: To seed the database with products from the API, select GET as the HTTP method, input https://ecommerce-to-react.herokuapp.com/seed in the address bar and hit Send.
+
+Remember to replace {productId}, {category}, {quantity}, and {cartItemId} with actual values as appropriate for your testing scenario.
