@@ -55,6 +55,9 @@ async function loadCart() {
         const response = await fetch('https://ecommerce-to-react.herokuapp.com/cart');
         const cartItems = await response.json();
 
+        // Log the response data to the console for debugging
+        console.log('Cart response data:', cartItems);
+
         // Clear existing cart items
         const cartDiv = document.getElementById('cart');
         cartDiv.innerHTML = '';
@@ -78,6 +81,7 @@ async function loadCart() {
         console.error('Failed to load cart:', err);
     }
 }
+
 
 // Function to add a product to the cart
 async function addToCart(productId, quantity) {
