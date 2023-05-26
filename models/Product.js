@@ -1,19 +1,12 @@
 import mongoose from 'mongoose';
 
 const productSchema = new mongoose.Schema({
- id: Number,
- title: String,
- price: Number,
- description: String,
- category: String,
- image: String
-});
-
-productSchema.virtual('carts', {
-  ref: 'Cart',
-  localField: 'id',
-  foreignField: 'product',
-  justOne: false
+  id: { type: Number, required: true, unique: true },
+  title: String,
+  price: Number,
+  description: String,
+  category: String,
+  image: String,
 });
 
 const Product = mongoose.model('Product', productSchema, 'products');

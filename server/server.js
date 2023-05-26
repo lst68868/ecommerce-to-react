@@ -52,31 +52,21 @@ process.on('SIGINT', () => {
 
 // Endpoint to seed the database with products from the given API
 app.get('/seed', async (req, res) => {
-  try {
-      const response = await axios.get('https://fakestoreapi.com/products');
-      const products = response.data;
+ try {
+   const response = await axios.get('https://fakestoreapi.com/products');
+   const products = response.data;
 
-      // Deleting all products before seeding
-      await Product.deleteMany({});
-      // Creating products
-      await Product.create(products);
+   // Deleting all products before seeding
+   await Product.deleteMany({});
+   // Creating products
+   await Product.create(products);
 
-      // Deleting all cart items before seeding
-      await Cart.deleteMany({});
-      // Creating a sample cart item with the first product and quantity 1
-      // Make sure there is at least one product
-      if (products.length > 0) {
-          const sampleCartItem = { product: products[0].id, quantity: 1 };
-          await Cart.create(sampleCartItem);
-      }
-
-      res.json({ message: 'Database seeded successfully' });
-  } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: 'Internal Server Error' });
-  }
+   res.json({ message: 'Database seeded successfully' });
+ } catch (error) {
+   console.error(error);
+   res.status(500).json({ error: 'Internal Server Error' });
+ }
 });
-
 
 // Endpoint to fetch all products
 app.get('/products', async (req, res) => {
@@ -119,6 +109,62 @@ app.get('/products/category/:category', async (req, res) => {
  }
 });
 
+// Endpoint to add a product to the database
+app.post('/products', async (req, res) => {
+  try {
+      const { id, title, price } = req.body;
+
+      const product = await Product.create({ id, title, price });
+
+      res.status(201).json(product);
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// Endpoint to delete a product from the database
+app.delete('/products/:id', async (req, res) => {
+  const productId = req.params.id;
+
+  try {
+      const product = await Product.findOneAndDelete({ id: productId });
+      if (!product) {
+          return res.status(404).json({ error: 'Product not found' });
+      }
+
+      res.json({ message: 'Product deleted successfully' });
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// Endpoint to update/edit a product in the database
+app.put('/products/:id', async (req, res) => {
+  const productId = req.params.id;
+  const { title, price } = req.body;
+
+  try {
+      const product = await Product.findOneAndUpdate(
+          { id: productId },
+          { title, price },
+          { new: true }
+      );
+      if (!product) {
+          return res.status(404).json({ error: 'Product not found' });
+      }
+
+      res.json(product);
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
+
+
 // Endpoint to add a product to the cart
 app.post('/cart', async (req, res) => {
  const { productId, quantity } = req.body;
@@ -140,26 +186,15 @@ app.post('/cart', async (req, res) => {
 
 // Endpoint to fetch all cart items
 app.get('/cart', async (req, res) => {
-  try {
-      // Populating product field to include all product information
-      const cartItems = await Cart.find({}).populate('product');
-      
-      // Check for undefined or null cartItems
-      if (!cartItems) {
-          console.error('Cart items not found');
-          return res.status(404).json({ error: 'Cart items not found' });
-      }
-
-      // Log the cart items for debugging
-      console.log('Cart items:', cartItems);
-      
-      res.json(cartItems);
-  } catch (error) {
-      console.error('Error retrieving cart items:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
-  }
+ try {
+   // Populating product field to include all product information
+   const cartItems = await Cart.find({}).populate('product');
+   res.json(cartItems);
+ } catch (error) {
+   console.error(error);
+   res.status(500).json({ error: 'Internal Server Error' });
+ }
 });
-
 
 // Delete a specific item from the cart by ID
 app.delete('/cart/:id', async (req, res) => {
