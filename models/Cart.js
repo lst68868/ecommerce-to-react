@@ -1,10 +1,10 @@
 import mongoose from 'mongoose';
 
 const cartItemSchema = new mongoose.Schema({
-  productId: String, // Assuming the API provides a 'productId' field for each product
-  quantity: Number
+  productID: String,
+  quantity: Number,
 });
 
-const Cart = mongoose.model('Cart', cartItemSchema);
+const Cart = mongoose.model('Cart', cartItemSchema, 'carts');
 
 export default Cart;

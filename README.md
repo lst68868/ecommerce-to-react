@@ -20,6 +20,7 @@ Create a .env file in the project root and provide the necessary environment var
 
 PORT=3000
 DATABASE_URI=mongodb://localhost:27017/ecommerce
+
 PORT: The port number on which the server will run. Default is 3000.
 DATABASE_URI: The MongoDB connection URI for your database.
 

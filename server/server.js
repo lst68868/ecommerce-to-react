@@ -1,19 +1,24 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
-import dotenv from 'dotenv';
-import axios from "axios";
-import Product from "/Users/leotulchin/Desktop/Coding_Projects/practice_projects/ecommerce-to-react/models/Product.js"
-import Cart from "/Users/leotulchin/Desktop/Coding_Projects/practice_projects/ecommerce-to-react/models/Cart.js"
-
-dotenv.config();
+import axios from 'axios';
+import dotenv from "dotenv"
+import { fileURLToPath } from 'url';
+import path from 'path';
+import Product from '/Users/leotulchin/Desktop/Coding_Projects/practice_projects/ecommerce-to-react/models/Product.js';
+import Cart from '/Users/leotulchin/Desktop/Coding_Projects/practice_projects/ecommerce-to-react/models/Cart.js';
 
 const app = express();
-const PORT = process.env.PORT || 3000;  // Default to 3000 if no PORT is set in .env
+dotenv.config()
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
 
+// Serve static files
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+app.use(express.static(path.join(__dirname, '..', 'client')));
 
 mongoose.connect(process.env.DATABASE_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 
@@ -21,17 +26,14 @@ mongoose.connection.on('connected', () => {
   console.log('Mongoose connection is open');
 });
 
-// If the connection throws an error
 mongoose.connection.on('error', (err) => {
   console.log(`Mongoose connection error has occurred: ${err}`);
 });
 
-// When the connection is disconnected
 mongoose.connection.on('disconnected', () => {
   console.log('Mongoose connection is disconnected');
 });
 
-// If the Node process ends, close the Mongoose connection
 process.on('SIGINT', () => {
   mongoose.connection.close(() => {
     console.log('Mongoose connection is disconnected due to application termination');
@@ -39,17 +41,16 @@ process.on('SIGINT', () => {
   });
 });
 
-//Only had to run once; populate mongo from API
+// Seed the database with products from the given API
 app.get('/seed', async (req, res) => {
   try {
     const response = await axios.get('https://fakestoreapi.com/products');
     const products = response.data;
 
-    for (const product of products) {
-      await Product.create(product);
-    }
+    await Product.deleteMany({});
+    await Product.create(products);
 
-    res.send('Database seeded successfully');
+    res.json({ message: 'Database seeded successfully' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
@@ -67,14 +68,16 @@ app.get('/products', async (req, res) => {
   }
 });
 
-// Display a specific product by ID
+// Get a specific product by ID
 app.get('/products/:id', async (req, res) => {
-  const id = req.params.id;
+  const productId = req.params.id;
+
   try {
-    const product = await Product.findOne({ id: id });
+    const product = await Product.findOne({id: productId});
     if (!product) {
       return res.status(404).json({ error: 'Product not found' });
     }
+
     res.json(product);
   } catch (error) {
     console.error(error);
@@ -82,31 +85,13 @@ app.get('/products/:id', async (req, res) => {
   }
 });
 
-// Update a specific product by ID
-app.put('/products/:id', async (req, res) => {
-  const id = req.params.id;
-  const updatedProductData = req.body;
-  try {
-    const updatedProduct = await Product.findOneAndUpdate({ id: id }, updatedProductData, { new: true });
-    if (!updatedProduct) {
-      return res.status(404).json({ error: 'Product not found' });
-    }
-    res.json(updatedProduct);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
+// Get products by category
+app.get('/products/category/:category', async (req, res) => {
+  const category = req.params.category;
 
-// Delete a specific product by ID
-app.delete('/products/:id', async (req, res) => {
-  const id = req.params.id;
   try {
-    const deletedProduct = await Product.findOneAndDelete({ id: id });
-    if (!deletedProduct) {
-      return res.status(404).json({ error: 'Product not found' });
-    }
-    res.json(deletedProduct);
+    const products = await Product.find({ category });
+    res.json(products);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
@@ -117,78 +102,48 @@ app.delete('/products/:id', async (req, res) => {
 app.post('/cart', async (req, res) => {
   const { productId, quantity } = req.body;
 
-  // Check if the product exists in the Product collection using the 'productId'
-  const product = await Product.findOne({ id: productId });
-  if (!product) {
-    return res.status(404).json({ error: 'Product not found' });
-  }
-
-  // Check if a cart already exists
-  const existingCart = await Cart.findOne();
-  if (existingCart) {
-    // If a cart exists, update the quantity of the existing cart item
-    const existingCartItem = existingCart.items.find(item => item.productId === productId);
-    if (existingCartItem) {
-      existingCartItem.quantity += quantity;
-    } else {
-      // If the product is not already in the cart, add a new cart item
-      existingCart.items.push({ productId, quantity });
+  try {
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
     }
-    await existingCart.save();
-    return res.json(existingCart);
-  }
 
-  // If no cart exists, create a new cart and add the item
-  const cart = await Cart.create({ items: [{ productId, quantity }] });
-  res.json(cart);
+    const cartItem = await Cart.create({ product, quantity });
+    res.json(cartItem);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 
-// View the cart
+// Fetch the cart items
 app.get('/cart', async (req, res) => {
-  const cart = await Cart.findOne();
-  if (!cart) {
-    return res.status(404).json({ error: 'Cart not found' });
+  try {
+    const cartItems = await Cart.find({}).populate('product');
+    res.json(cartItems);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
-  res.json(cart);
 });
 
-// Adjust the quantity of a product in the cart
-app.put('/cart/:id', async (req, res) => {
-  const { quantity } = req.body;
-
-  const cart = await Cart.findOne();
-  if (!cart) {
-    return res.status(404).json({ error: 'Cart not found' });
-  }
-
-  const cartItem = cart.items.find(item => item._id.toString() === req.params.id);
-  if (!cartItem) {
-    return res.status(404).json({ error: 'Cart item not found' });
-  }
-
-  cartItem.quantity = quantity;
-  await cart.save();
-
-  res.json(cart);
-});
-
-// Delete a product from the cart
+// Remove a cart item
 app.delete('/cart/:id', async (req, res) => {
-  const cart = await Cart.findOne();
-  if (!cart) {
-    return res.status(404).json({ error: 'Cart not found' });
+  const itemId = req.params.id;
+
+  try {
+    const cartItem = await Cart.findByIdAndDelete(itemId);
+    if (!cartItem) {
+      return res.status(404).json({ error: 'Cart item not found' });
+    }
+
+    res.json(cartItem);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
-
-  const cartItemIndex = cart.items.findIndex(item => item._id.toString() === req.params.id);
-  if (cartItemIndex === -1) {
-    return res.status(404).json({ error: 'Cart item not found' });
-  }
-
-  cart.items.splice(cartItemIndex, 1);
-  await cart.save();
-
-  res.json(cart);
 });
+
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
