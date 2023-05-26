@@ -1,6 +1,8 @@
 # E-Commerce API Server
 
-This is an API server for an e-commerce application that provides routes for managing products and the user's shopping cart. The server is built with Node.js, Express, and MongoDB using Mongoose as the ODM (Object Data Modeling) library.
+This is an API server for an e-commerce application that provides routes for managing products and the user's shopping cart. The server is built with Node.js, Express, and MongoDB using Mongoose as the ODM (Object Data Modeling) library. I will be adding a React frontend; for now, this application serves as a working backend.
+
+The application is currently deployed at [https://ecommerce-to-react.herokuapp.com](https://ecommerce-to-react.herokuapp.com).
 
 ## Prerequisites
 

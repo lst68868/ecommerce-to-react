@@ -1,3 +1,4 @@
+// Importing necessary dependencies
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
@@ -8,20 +9,27 @@ import path from 'path';
 import Product from '../models/Product.js';
 import Cart from '../models/Cart.js';
 
+// Instantiating the express app
 const app = express();
+// Accessing environment variables
 dotenv.config();
+// Setting port from environment variables or default 3000
 const PORT = process.env.PORT || 3000;
 
+// Applying CORS middleware to allow requests from different origins
 app.use(cors());
+// Applying middleware for JSON body parsing
 app.use(express.json());
 
-// Serve static files
+// Setting up to serve static files
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use(express.static(path.join(__dirname, '..', 'client')));
 
+// Connecting to MongoDB
 mongoose.connect(process.env.DATABASE_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 
+// Handling connection events
 mongoose.connection.on('connected', () => {
  console.log('Mongoose connection is open');
 });
@@ -34,6 +42,7 @@ mongoose.connection.on('disconnected', () => {
  console.log('Mongoose connection is disconnected');
 });
 
+// Gracefully handling application termination by closing MongoDB connection
 process.on('SIGINT', () => {
  mongoose.connection.close(() => {
    console.log('Mongoose connection is disconnected due to application termination');
@@ -41,13 +50,15 @@ process.on('SIGINT', () => {
  });
 });
 
-// Seed the database with products from the given API
+// Endpoint to seed the database with products from the given API
 app.get('/seed', async (req, res) => {
  try {
    const response = await axios.get('https://fakestoreapi.com/products');
    const products = response.data;
 
+   // Deleting all products before seeding
    await Product.deleteMany({});
+   // Creating products
    await Product.create(products);
 
    res.json({ message: 'Database seeded successfully' });
@@ -57,7 +68,7 @@ app.get('/seed', async (req, res) => {
  }
 });
 
-// Display all products
+// Endpoint to fetch all products
 app.get('/products', async (req, res) => {
  try {
    const products = await Product.find({});
@@ -68,7 +79,7 @@ app.get('/products', async (req, res) => {
  }
 });
 
-// Get a specific product by ID
+// Endpoint to fetch a specific product by ID
 app.get('/products/:id', async (req, res) => {
  const productId = req.params.id;
 
@@ -85,7 +96,7 @@ app.get('/products/:id', async (req, res) => {
  }
 });
 
-// Get products by category
+// Endpoint to fetch products by category
 app.get('/products/category/:category', async (req, res) => {
  const category = req.params.category;
 
@@ -98,7 +109,7 @@ app.get('/products/category/:category', async (req, res) => {
  }
 });
 
-// Add a product to the cart
+// Endpoint to add a product to the cart
 app.post('/cart', async (req, res) => {
  const { productId, quantity } = req.body;
 
@@ -108,6 +119,7 @@ app.post('/cart', async (req, res) => {
      return res.status(404).json({ error: 'Product not found' });
    }
 
+   // Creating a new cart item
    const cartItem = await Cart.create({ product: product.id, quantity });
    res.json(cartItem);
  } catch (error) {
@@ -116,9 +128,10 @@ app.post('/cart', async (req, res) => {
  }
 });
 
-// Fetch the cart items
+// Endpoint to fetch all cart items
 app.get('/cart', async (req, res) => {
  try {
+   // Populating product field to include all product information
    const cartItems = await Cart.find({}).populate('product');
    res.json(cartItems);
  } catch (error) {
@@ -127,6 +140,7 @@ app.get('/cart', async (req, res) => {
  }
 });
 
+// Starting the server
 app.listen(PORT, () => {
  console.log(`Server is running on port ${PORT}`);
 });
