@@ -31,7 +31,7 @@ async function loadCart() {
         const cartItems = await response.json();
 
         const cartDiv = document.getElementById('cart');
-        cartDiv.innerHTML = '';
+        cartDiv.innerHTML = 'No items yet';
 
         for (let item of cartItems) {
             const cartItemDiv = document.createElement('div');
