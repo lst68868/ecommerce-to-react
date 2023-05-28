@@ -1,29 +1,20 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>E-commerce Site</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Information</title>
 </head>
 <body>
-    <button id="loadProducts">Load Products</button>
-    <button id="clearProducts">Clear Products</button>
-    <div id="products"></div>
+  <h1>Product Information</h1>
+  <div>
+    <button id="getProducts">Get All Products</button>
+    <button id="getProduct">Get Product by ID</button>
+    <button id="clearAll">Clear All Products</button>
+    <button id="clearProduct">Clear Product</button>
+  </div>
+  <div id="result"></div>
 
-    <h2>Your Cart</h2>
-    <button id="loadCart">Load Cart</button>
-    <button id="toggleCart">Toggle Cart</button>
-    <div id="cart" style="display: none;"></div>
-
-    <h2>Add to Cart</h2>
-    <form id="addToCartForm">
-        <label for="productId">Product ID:</label>
-        <input type="text" id="productId" name="productId" required>
-
-        <label for="quantity">Quantity:</label>
-        <input type="number" id="quantity" name="quantity" min="1" required>
-
-        <input type="submit" value="Add to Cart">
-    </form>
-
-    <script src="main.js"></script>
+  <script src="main.js"></script>
 </body>
 </html>

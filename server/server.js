@@ -42,7 +42,7 @@ mongoose.connection.on('disconnected', () => {
  console.log('Mongoose connection is disconnected');
 });
 
-// Gracefully handling application termination by closing MongoDB connection
+// Gracefully handling application termination by closing MongoDB connection (Thanks chatGPT)
 process.on('SIGINT', () => {
  mongoose.connection.close(() => {
    console.log('Mongoose connection is disconnected due to application termination');
@@ -112,11 +112,12 @@ app.get('/products/category/:category', async (req, res) => {
 // Endpoint to add a product to the database
 app.post('/products', async (req, res) => {
   try {
-      const { id, title, price } = req.body;
+      const { id, title, price, description, category, image } = req.body;
 
-      const product = await Product.create({ id, title, price });
+      const product = await Product.create({ id, title, price, description, category, image });
 
       res.status(201).json(product);
+      
   } catch (error) {
       console.error(error);
       res.status(500).json({ error: 'Internal Server Error' });
@@ -163,8 +164,6 @@ app.put('/products/:id', async (req, res) => {
 });
 
 
-
-
 // Endpoint to add a product to the cart
 app.post('/cart', async (req, res) => {
  const { productId, quantity } = req.body;
@@ -196,73 +195,7 @@ app.get('/cart', async (req, res) => {
  }
 });
 
-// Delete a specific item from the cart by ID
-app.delete('/cart/:id', async (req, res) => {
- const cartItemId = req.params.id;
 
- try {
-   const cartItem = await Cart.findById(cartItemId);
-   if (!cartItem) {
-     return res.status(404).json({ error: 'Cart item not found' });
-   }
-
-   await Cart.findByIdAndDelete(cartItemId);
-   res.json({ message: 'Cart item removed successfully' });
- } catch (error) {
-   console.error(error);
-   res.status(500).json({ error: 'Internal Server Error' });
- }
-});
-
-// Delete a specific item from the cart by ID
-app.delete('/cart/:id', async (req, res) => {
- const cartItemId = req.params.id;
-
- try {
-   const cartItem = await Cart.findOne({ id: cartItemId });
-   if (!cartItem) {
-     return res.status(404).json({ error: 'Cart item not found' });
-   }
-
-   await Cart.deleteOne({ id: cartItemId });
-   res.json({ message: 'Cart item removed successfully' });
- } catch (error) {
-   console.error(error);
-   res.status(500).json({ error: 'Internal Server Error' });
- }
-});
-
-// Clear the entire cart
-app.delete('/cart', async (req, res) => {
- try {
-   await Cart.deleteMany({});
-   res.json({ message: 'Cart cleared successfully' });
- } catch (error) {
-   console.error(error);
-   res.status(500).json({ error: 'Internal Server Error' });
- }
-});
-
-// Update the quantity of a specific cart item
-app.put('/cart/:id', async (req, res) => {
- const cartItemId = req.params.id;
- const { quantity } = req.body;
-
- try {
-   const cartItem = await Cart.findOne({ id: cartItemId });
-   if (!cartItem) {
-     return res.status(404).json({ error: 'Cart item not found' });
-   }
-
-   cartItem.quantity = quantity;
-   await cartItem.save();
-   
-   res.json(cartItem);
- } catch (error) {
-   console.error(error);
-   res.status(500).json({ error: 'Internal Server Error' });
- }
-});
 
 
 // Starting the server
