@@ -52,7 +52,7 @@ async function makeGetRequest(url) {
   
   // Event listener for the "Get Products" button
   document.getElementById('getProducts').addEventListener('click', () => {
-    makeGetRequest('http://localhost:3002/products');
+    makeGetRequest('https://ecommerce-to-react.herokuapp.com/products');
   });
   
   // Event listener for the "Get Product" button
@@ -60,7 +60,7 @@ async function makeGetRequest(url) {
     // Prompt the user to enter the product ID
     const productId = prompt('Enter the product ID:');
     if (productId) {
-      makeGetRequest(`http://localhost:3002/products/${productId}`);
+      makeGetRequest(`https://ecommerce-to-react.herokuapp.com/products/${productId}`);
     }
   });
   
